@@ -29,40 +29,65 @@
 
     <script>
         async function fetchBurgers() {
-            const response = await fetch('/api/burgers');
-            const burgers = await response.json();
-            const burgerList = document.getElementById('burgerList');
-            burgerList.innerHTML = burgers.map((burger, index) => `
-                <div class="burger-item">
-                    <h3>${burger.name}</h3>
-                    <p>Price: ${burger.price}</p>
-                    <img src="${burger.photo}" alt="${burger.name}" width="100">
-                    <button onclick="deleteBurger(${index})">Delete</button>
-                </div>
-            `).join('');
+            try {
+                const response = await fetch('/api/burgers');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const burgers = await response.json();
+                const burgerList = document.getElementById('burgerList');
+                burgerList.innerHTML = burgers.map((burger, index) => `
+                    <div class="burger-item">
+                        <h3>${burger.name}</h3>
+                        <p>Price: ${burger.price}</p>
+                        <img src="${burger.photo}" alt="${burger.name}" width="100">
+                        <button onclick="deleteBurger(${index})">Delete</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching burgers:', error);
+                document.getElementById('burgerList').innerHTML = `<p>Error loading burgers: ${error.message}</p>`;
+            }
         }
-
+    
         async function addBurger(event) {
             event.preventDefault();
-            const name = document.getElementById('burgerName').value;
-            const price = document.getElementById('burgerPrice').value;
-            const photo = document.getElementById('burgerPhoto').value;
-            
-            await fetch('/api/burgers', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, price, photo })
-            });
-            
-            fetchBurgers();
-            event.target.reset();
+            try {
+                const name = document.getElementById('burgerName').value;
+                const price = document.getElementById('burgerPrice').value;
+                const photo = document.getElementById('burgerPhoto').value;
+                
+                const response = await fetch('/api/burgers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, price, photo })
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                await fetchBurgers();
+                event.target.reset();
+            } catch (error) {
+                console.error('Error adding burger:', error);
+                alert(`Error adding burger: ${error.message}`);
+            }
         }
-
+    
         async function deleteBurger(index) {
-            await fetch(`/api/burgers/${index}`, { method: 'DELETE' });
-            fetchBurgers();
+            try {
+                const response = await fetch(`/api/burgers/${index}`, { method: 'DELETE' });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                await fetchBurgers();
+            } catch (error) {
+                console.error('Error deleting burger:', error);
+                alert(`Error deleting burger: ${error.message}`);
+            }
         }
-
+    
         document.getElementById('newBurgerForm').addEventListener('submit', addBurger);
         fetchBurgers();
     </script>

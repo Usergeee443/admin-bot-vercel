@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
 const MAIN_API_TOKEN = '7251586758:AAGup0Hx_TjQGCWR-pt69WQRroB_lL39g_E';
-const SERVER_URL = 'http://localhost:3000'; // Update this if your server is hosted elsewhere
+const SERVER_URL = 'https://admin-bot-test.vercel.app';
 
 const bot = new TelegramBot(MAIN_API_TOKEN, { polling: true });
 
